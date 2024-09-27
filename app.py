@@ -58,10 +58,6 @@ def load_and_preprocess_data():
 @st.cache_resource
 def train_and_save_models(X, y):
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-    
-    scaler = StandardScaler()
-    X_train_scaled = scaler.fit_transform(X_train)
-    X_test_scaled = scaler.transform(X_test)
 
     models = {
         'Random Forest': RandomForestClassifier(n_estimators=100, random_state=42),
@@ -74,8 +70,8 @@ def train_and_save_models(X, y):
     accuracies = {}
 
     for name, model in models.items():
-        model.fit(X_train_scaled, y_train)
-        y_pred = model.predict(X_test_scaled)
+        model.fit(X_train, y_train)
+        y_pred = model.predict(X_test)
         accuracy = accuracy_score(y_test, y_pred)
         trained_models[name] = model
         accuracies[name] = accuracy
@@ -194,9 +190,8 @@ def main():
         with st.spinner("Tahmin yapılıyor..."):
             time.sleep(1)  # Simüle edilmiş işlem süresi
             input_df = pd.DataFrame([user_input])
-            input_scaled = scaler.transform(input_df)
-            prediction = model.predict(input_scaled)
-            probabilities = model.predict_proba(input_scaled)
+            prediction = model.predict(input_df)
+            probabilities = model.predict_proba(input_df)
 
         st.markdown("## Tahmin Sonuçları")
         col1, col2 = st.columns(2)
@@ -248,8 +243,7 @@ def main():
     
     with tab2:
         st.markdown("### Model Performans Metrikleri")
-        X_test_scaled = scaler.transform(X_test)
-        y_pred = model.predict(X_test_scaled)
+        y_pred = model.predict(X_test)
         
         col1, col2 = st.columns(2)
         with col1:
