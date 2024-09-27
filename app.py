@@ -248,19 +248,14 @@ def main():
         st.markdown("### Model Performans Metrikleri")
         X_test_scaled = scaler.transform(X_test)
         y_pred = model.predict(X_test_scaled)
-    
+        
         col1, col2 = st.columns(2)
         with col1:
             st.markdown("#### Sınıflandırma Raporu")
             report = classification_report(y_test, y_pred, output_dict=True)
             df_report = pd.DataFrame(report).transpose()
-            
-            # Check if df_report is empty before displaying
-            if not df_report.empty:
-                st.dataframe(df_report)
-            else:
-                st.warning("Sınıflandırma raporu oluşturulamadı. Modelin eğitildiğinden emin olun.")
-    
+            st.dataframe(df_report)
+        
         with col2:
             st.markdown("#### Karmaşıklık Matrisi")
             cm = confusion_matrix(y_test, y_pred)
