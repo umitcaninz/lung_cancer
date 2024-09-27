@@ -246,7 +246,7 @@ def main():
     st.markdown("---")
     st.markdown("## Model Analizi")
     
-    tab1 = st.tabs(["📊 Özellik Önemliliği"])
+    tab1, = st.tabs(["📊 Özellik Önemliliği"])
     
     with tab1:
         st.markdown("### Özellik Önemliliği")
