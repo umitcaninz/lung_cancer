@@ -191,14 +191,20 @@ def main():
         else:
             choice = st.sidebar.selectbox(f"{turkish}:", ('Hayır', 'Evet'))
             user_input[english] = 2 if choice == 'Evet' else 1
-
     if st.sidebar.button('Tahmin Et', key='predict'):
         with st.spinner("Tahmin yapılıyor..."):
             time.sleep(1)  # Simüle edilmiş işlem süresi
             input_df = pd.DataFrame([user_input])
             input_scaled = scaler.transform(input_df)
-            prediction = model.predict(input_scaled)
-            probabilities = model.predict_proba(input_scaled)
+
+            # Check if the selected model supports predict_proba
+            if hasattr(model, 'predict_proba'):
+                prediction = model.predict(input_scaled)
+                probabilities = model.predict_proba(input_scaled)
+            else:
+                # If predict_proba is not available, predict directly
+                prediction = model.predict(input_scaled)
+                probabilities = [[1 - prediction[0], prediction[0]]]
 
         st.markdown("## Tahmin Sonuçları")
         col1, col2 = st.columns(2)
@@ -209,6 +215,7 @@ def main():
             else:
                 st.success('Tahmin: Akciğer kanseri riski düşük.')
 
+            # Correctly format the probability percentages
             st.metric("Akciğer kanseri olma olasılığı", f"{probabilities[0][1]:.2%}")
             st.metric("Akciğer kanseri olmama olasılığı", f"{probabilities[0][0]:.2%}")
 
@@ -234,7 +241,8 @@ def main():
                         'value': probabilities[0][1]}}))
             fig.update_layout(paper_bgcolor="lavender", font={'color': "darkblue", 'family': "Arial"})
             st.plotly_chart(fig)
-
+            
+            
     st.markdown("---")
     st.markdown("## Model Analizi")
     
