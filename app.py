@@ -88,7 +88,7 @@ def train_and_save_models(X, y):
 @st.cache_resource
 def load_models_and_scaler():
     models = {}
-    for name in ['Random Forest', 'Logistic Regression', 'SVM', 'Decision Tree']:
+    for name in ['Random Forest', 'Logistic Regression', 'SVM']:
         model_path = MODEL_PATH.format(name.lower().replace(' ', '_'))
         if os.path.exists(model_path):
             models[name] = joblib.load(model_path)
