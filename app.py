@@ -248,8 +248,8 @@ def main():
             cm = confusion_matrix(y_test, y_pred)
             fig = ff.create_annotated_heatmap(
                 z=cm, 
-                x=['Negatif', 'Pozitif'], 
-                y=['Negatif', 'Pozitif'],
+                x = ['Negatif', 'Pozitif'], 
+                y = ['Negatif', 'Pozitif'],
                 colorscale='Blues'
             )
             fig.update_layout(title='Karmaşıklık Matrisi', xaxis_title='Tahmin Edilen', yaxis_title='Gerçek Değer')
