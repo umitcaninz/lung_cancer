@@ -5,7 +5,6 @@ from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.linear_model import LogisticRegression
 from sklearn.svm import SVC
-from sklearn.tree import DecisionTreeClassifier
 from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import accuracy_score, confusion_matrix, classification_report
 import plotly.graph_objs as go
@@ -67,7 +66,6 @@ def train_and_save_models(X, y):
         'Random Forest': RandomForestClassifier(n_estimators=100, random_state=42),
         'Logistic Regression': LogisticRegression(random_state=42),
         'SVM': SVC(random_state=42, probability=True),
-        'Decision Tree': DecisionTreeClassifier(random_state=42)
     }
 
     trained_models = {}
@@ -88,7 +86,7 @@ def train_and_save_models(X, y):
 @st.cache_resource
 def load_models_and_scaler():
     models = {}
-    for name in ['Random Forest', 'Logistic Regression', 'SVM', 'Decision Tree']:
+    for name in ['Random Forest', 'Logistic Regression', 'SVM']:
         model_path = MODEL_PATH.format(name.lower().replace(' ', '_'))
         if os.path.exists(model_path):
             models[name] = joblib.load(model_path)
@@ -152,7 +150,7 @@ def main():
             models, scaler, accuracies, X_test, y_test = train_and_save_models(X, y)
         st.success(f"Modeller başarıyla eğitildi.")
 
-    
+    f
     selected_model = st.sidebar.selectbox("Model Seçin", list(models.keys()))
     model = models[selected_model]
 
