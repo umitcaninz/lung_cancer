@@ -5,6 +5,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.linear_model import LogisticRegression
 from sklearn.svm import SVC
+from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import accuracy_score, confusion_matrix, classification_report
 import plotly.graph_objs as go
 import plotly.figure_factory as ff
@@ -14,6 +15,7 @@ import time
 
 # Sabitler
 MODEL_PATH = "lung_cancer_model_{}.joblib"
+SCALER_PATH = "scaler.joblib"
 DATA_PATH = "lung_cancer.xlsx"
 
 # Tema ve stil ayarları
@@ -55,6 +57,10 @@ def load_and_preprocess_data():
 @st.cache_resource
 def train_and_save_models(X, y):
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+    
+    scaler = StandardScaler()
+    X_train_scaled = scaler.fit_transform(X_train)
+    X_test_scaled = scaler.transform(X_test)
 
     models = {
         'Random Forest': RandomForestClassifier(n_estimators=100, random_state=42),
@@ -66,24 +72,30 @@ def train_and_save_models(X, y):
     accuracies = {}
 
     for name, model in models.items():
-        model.fit(X_train, y_train)
-        y_pred = model.predict(X_test)
+        model.fit(X_train_scaled, y_train)
+        y_pred = model.predict(X_test_scaled)
         accuracy = accuracy_score(y_test, y_pred)
         trained_models[name] = model
         accuracies[name] = accuracy
         joblib.dump(model, MODEL_PATH.format(name.lower().replace(' ', '_')))
 
-    return trained_models, accuracies, X_test, y_test
+    joblib.dump(scaler, SCALER_PATH)
+
+    return trained_models, scaler, accuracies, X_test, y_test
 
 @st.cache_resource
-def load_models():
+def load_models_and_scaler():
     models = {}
-    for name in ['Random Forest', 'Logistic Regression', 'SVM']:
+    for name in ['Random Forest', 'Logistic Regression', 'SVM', 'Decision Tree']:
         model_path = MODEL_PATH.format(name.lower().replace(' ', '_'))
         if os.path.exists(model_path):
             models[name] = joblib.load(model_path)
     
-    return models
+    scaler = None
+    if os.path.exists(SCALER_PATH):
+        scaler = joblib.load(SCALER_PATH)
+    
+    return models, scaler
 
 def plot_feature_importance(model, feature_names):
     if hasattr(model, 'feature_importances_'):
@@ -132,12 +144,13 @@ def main():
     X = df.drop('LUNG_CANCER', axis=1)
     y = df['LUNG_CANCER']
 
-    models = load_models()
-    if not models:
+    models, scaler = load_models_and_scaler()
+    if not models or scaler is None:
         with st.spinner('Modeller eğitiliyor, lütfen bekleyin...'):
-            models, accuracies, X_test, y_test = train_and_save_models(X, y)
+            models, scaler, accuracies, X_test, y_test = train_and_save_models(X, y)
         st.success(f"Modeller başarıyla eğitildi.")
 
+    
     selected_model = st.sidebar.selectbox("Model Seçin", list(models.keys()))
     model = models[selected_model]
 
@@ -179,8 +192,9 @@ def main():
         with st.spinner("Tahmin yapılıyor..."):
             time.sleep(1)  # Simüle edilmiş işlem süresi
             input_df = pd.DataFrame([user_input])
-            prediction = model.predict(input_df)
-            probabilities = model.predict_proba(input_df)
+            input_scaled = scaler.transform(input_df)
+            prediction = model.predict(input_scaled)
+            probabilities = model.predict_proba(input_scaled)
 
         st.markdown("## Tahmin Sonuçları")
         col1, col2 = st.columns(2)
@@ -232,7 +246,8 @@ def main():
     
     with tab2:
         st.markdown("### Model Performans Metrikleri")
-        y_pred = model.predict(X_test)
+        X_test_scaled = scaler.transform(X_test)
+        y_pred = model.predict(X_test_scaled)
         
         col1, col2 = st.columns(2)
         with col1:
@@ -253,5 +268,5 @@ def main():
             fig.update_layout(title='Karmaşıklık Matrisi', xaxis_title='Tahmin Edilen', yaxis_title='Gerçek Değer')
             st.plotly_chart(fig, use_container_width=True)
 
-if __name__ == "__main__":
+if _name_ == "_main_":
     main()
