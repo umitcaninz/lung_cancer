@@ -77,9 +77,8 @@ def train_and_save_models(X, y):
         accuracies[name] = accuracy
         joblib.dump(model, MODEL_PATH.format(name.lower().replace(' ', '_')))
 
-    joblib.dump(scaler, SCALER_PATH)
 
-    return trained_models, scaler, accuracies, X_test, y_test
+    return trained_models, accuracies, X_test, y_test
 
 @st.cache_resource
 def load_models_and_scaler():
@@ -88,12 +87,9 @@ def load_models_and_scaler():
         model_path = MODEL_PATH.format(name.lower().replace(' ', '_'))
         if os.path.exists(model_path):
             models[name] = joblib.load(model_path)
+
     
-    scaler = None
-    if os.path.exists(SCALER_PATH):
-        scaler = joblib.load(SCALER_PATH)
-    
-    return models, scaler
+    return models
 
 def plot_feature_importance(model, feature_names):
     if hasattr(model, 'feature_importances_'):
