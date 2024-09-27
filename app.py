@@ -4,7 +4,6 @@ import numpy as np
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.linear_model import LogisticRegression
-from sklearn.svm import SVC
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import accuracy_score, confusion_matrix, classification_report
@@ -66,7 +65,6 @@ def train_and_save_models(X, y):
     models = {
         'Random Forest': RandomForestClassifier(n_estimators=100, random_state=42),
         'Logistic Regression': LogisticRegression(random_state=42),
-        'SVM': SVC(random_state=42, probability=True)
     }
 
     trained_models = {}
@@ -87,7 +85,7 @@ def train_and_save_models(X, y):
 @st.cache_resource
 def load_models_and_scaler():
     models = {}
-    for name in ['Random Forest', 'Logistic Regression', 'SVM']:
+    for name in ['Random Forest', 'Logistic Regression']:
         model_path = MODEL_PATH.format(name.lower().replace(' ', '_'))
         if os.path.exists(model_path):
             models[name] = joblib.load(model_path)
