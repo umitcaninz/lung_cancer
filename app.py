@@ -5,7 +5,6 @@ from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.linear_model import LogisticRegression
 from sklearn.svm import SVC
-from sklearn.tree import DecisionTreeClassifier
 from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import accuracy_score, confusion_matrix, classification_report
 import plotly.graph_objs as go
@@ -66,8 +65,7 @@ def train_and_save_models(X, y):
     models = {
         'Random Forest': RandomForestClassifier(n_estimators=100, random_state=42),
         'Logistic Regression': LogisticRegression(random_state=42),
-        'SVM': SVC(random_state=42, probability=True),
-        'Decision Tree': DecisionTreeClassifier(random_state=42)
+        'SVM': SVC(random_state=42, probability=True)
     }
 
     trained_models = {}
