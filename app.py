@@ -65,7 +65,7 @@ def train_and_save_models(X, y):
     models = {
         'Random Forest': RandomForestClassifier(n_estimators=100, random_state=42),
         'Logistic Regression': LogisticRegression(random_state=42),
-        'SVM': SVC(random_state=42, probability=True),
+        'SVM': SVC(random_state=42, probability=True)
     }
 
     trained_models = {}
@@ -150,7 +150,7 @@ def main():
             models, scaler, accuracies, X_test, y_test = train_and_save_models(X, y)
         st.success(f"Modeller başarıyla eğitildi.")
 
-    f
+    
     selected_model = st.sidebar.selectbox("Model Seçin", list(models.keys()))
     model = models[selected_model]
 
